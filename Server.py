@@ -41,7 +41,7 @@ def page(page):
         abort(404)
 
 # AI 쿼리 경로
-@app.route("/query", methods=["POST"])
+@app.route("/question", methods=["POST"])
 def query():
     
     #return jsonify({"answer": '제돌이 공부 중입니다. 14시 ~ 15시까지'})

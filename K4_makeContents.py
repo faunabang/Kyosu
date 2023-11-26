@@ -67,7 +67,7 @@ def makeContents(file_path):
     #print("response.choices[0].message=",response)
     contents= response.choices[0].message.content
 
-    return contents       
+    return contents
 
 
 if __name__ == "__main__":
@@ -77,7 +77,8 @@ if __name__ == "__main__":
 
     print(f"contents: {contents}")
 
-    
+
+    # 목차 저장
     file_name = file_path.split("/")[1].split(".")[0]
     contents_id = fun.rnd_str()
     contents_name = f"{file_name}-{contents_id}.txt"
@@ -90,8 +91,7 @@ if __name__ == "__main__":
 
     full_file_path = os.path.join(folder_path, contents_name)
 
-    # 텍스트 파일로 저장
     with open(full_file_path, 'w', encoding='utf-8') as file:
         file.write(contents)
 
-    print(f"\n파일 '{full_file_path}'에 텍스트 저장 완료")
+    print(f"\n'{full_file_path}'에 텍스트 저장 완료")
