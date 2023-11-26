@@ -1,0 +1,51 @@
+body{
+    font-family: 'Nanum Gothic'; 
+    font-size: 1.2em !important;
+}
+html[data-bs-theme='light'] * {
+    color: rgb(30,30, 30); /* 어두운 테마에서는 흰색 텍스트 */
+    /* background-color:rgb(244, 249, 252); */
+}
+html[data-bs-theme='dark'] * {
+    color: rgb(200,200, 200); /* 어두운 테마에서는 흰색 텍스트 */
+    background-color:rgb(7, 35, 55);
+}
+.bottom{ font-size: 0.9em }
+@media (max-width: 500px) {
+    body { font-size: 0.85em;}
+   .form-control{ font-size: 1em !important;} 
+   .bottom{ font-size: 0.7em !important; }
+   .sm-p-5{
+    padding:10px !important;
+   }
+   .sm-mt-5{
+    margin-top: 10px !important;
+   }
+}
+.sm-p-5{ padding:30px;}
+.sm-mt-5{ margin-top: 30px;}   
+.cursor-pointer { cursor: pointer;}
+.cursor-default { cursor: default;}
+@keyframes colorChange {
+0% { color: rgb(200,200,200);; } /* Change to your starting color */
+50% { color: #d69bbc; } /* Change to the color at halfway point */
+100% { color:rgb(200,200,200); } /* Change back to your starting color */
+}
+.standby-Mic {
+animation: colorChange 5s infinite; /* Runs the animation over 2 seconds, repeatedly */
+}
+.loading {
+    /* Your styling here */
+    font-size: 16px; /* example size, adjust as needed */
+    /* Additional styles */
+}
+#clientDevicesId {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    z-index: 100;
+}
+
+
+
