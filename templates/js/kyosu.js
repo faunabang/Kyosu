@@ -93,7 +93,7 @@ function chat_start(_this){
     $("#chat-box").append(`${micIcon}`);  binding();
     $("#chat-play-pause-button").show(500)
     $(".micIcon").show(500)
-    recognition.start(); // 음성 인
+    recognition.start(); // 음성 인식 시작
    
 };
 function chat_stop(){
