@@ -1,5 +1,5 @@
 from openai import OpenAI
-import K3_GuitarFun as fun
+import K3_GuitarFun as k3
 import os
 import pdfplumber
 from datetime import datetime
@@ -48,6 +48,7 @@ def makeContents(file_path):
                         목차는 줄바꿈을 기준으로 나눈다.
                         목차의 순서는 표시하지 않고, 목차 내용만 작성한다.
                         목차 내용은 해당 목차 내에 있는 교재의 내용을 포괄하는 문장형식으로 작성한다.
+                        목차의 개수는 최대 10개이다. 10개 이내로 교재의 모든 내용을 설명할 수 있는 목차를 생성한다.
                         다음은 교재의 내용이다.
                         """})
 
@@ -70,20 +71,12 @@ def makeContents(file_path):
     return contents
 
 
-if __name__ == "__main__":
-
-    file_path = "files/kinetic_theory_of_gases.pdf"
-    contents = makeContents(file_path)
-
-    print(f"contents: {contents}")
-
-
-    # 목차 저장
-    file_name = file_path.split("/")[1].split(".")[0]
-    contents_id = fun.rnd_str()
-    contents_name = f"{file_name}-{contents_id}.txt"
+# 목차 저장
+def save_contents(contents, file_path, id):
 
     today = str(datetime.now().date().today())
+    file_name = file_path.split("/")[1].split(".")[0]
+    contents_name = f"{file_name}-{id}.txt"
     folder_path = f"contents\{file_name}-{today}"
 
     if not os.path.exists(folder_path):
@@ -94,4 +87,16 @@ if __name__ == "__main__":
     with open(full_file_path, 'w', encoding='utf-8') as file:
         file.write(contents)
 
-    print(f"\n'{full_file_path}'에 텍스트 저장 완료")
+    print(f"\n'{full_file_path}'에 강의 목차 저장 완료")
+
+
+if __name__ == "__main__":
+
+    file_path = "files/kinetic_theory_of_gases.pdf" # 파일 경로 -----------------------------
+    # id = "d62ta"
+    id = k3.rnd_str()
+    contents = makeContents(file_path)
+
+    print(f"contents: {contents}")
+
+    save_contents(contents, file_path, id)

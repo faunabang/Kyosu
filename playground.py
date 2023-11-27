@@ -13,7 +13,6 @@ response  = client.chat.completions.create(
             stream=True
             ) 
 
-collected_chunks = []
 collected_messages = []
 
 for chunk in response:
@@ -21,6 +20,4 @@ for chunk in response:
     collected_messages.append(chunk_message)
     print(chunk_message, end="", flush=True)
 
-pdf_file = "files/chemi_1.pdf"
-file_name = pdf_file.split("/")[1]
-print(file_name)
+print("\n",collected_messages)

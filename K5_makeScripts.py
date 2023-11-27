@@ -1,5 +1,5 @@
 from openai import OpenAI
-import K3_GuitarFun as fun
+import K3_GuitarFun as k3
 import os
 import pdfplumber
 from datetime import datetime
@@ -57,7 +57,7 @@ def makeScripts(pdf_path, contents_id):
     with open(f"contents\{file_name}-{today}\{file_name}-{contents_id}.txt", 'r', encoding='utf-8') as file:
         for line in file:
             contents.append(line.strip())
-    print(contents)
+    print("contents:", contents)
 
     client = OpenAI()
     prompt=[]
@@ -72,6 +72,8 @@ def makeScripts(pdf_path, contents_id):
                         강의 대본 중간중간에 강사가 지을 표정을 작성한다.
                         표정은 다음 리스트에 있는 것 중 한 가지를 선택하여 (표정)과 같은 형태로 작성한다.
                         표정 리스트 = [웃음, 안타까움, 감탄, 노려봄, 음미]
+                        표정 리스트에 포함된 표정을 제외하고는 () 안에 어떠한 내용도 작성하지 않는다.
+                        표정 작성은 (웃음), (안타까움), (감탄), (노려봄), (음미) 와 같이 작성한다.
                         교재의 파일명은 {file_name}이다.
                         다음은 교재의 내용이다.
                         """})
@@ -92,7 +94,8 @@ def makeScripts(pdf_path, contents_id):
     prompt.append({"role": "system", "content": f"""
                         위는 강의의 전체 목차를 순서대로 나열한 것이다.
                         각 목차의 강의가 끝날 때마다 잠시간 질문 시간을 가지며, 질문 시간이 끝나면 바로 다음 목차의 강의를 시작한다.
-                        첫 목차의 강의 대본의 시작부분에는 첫인사와 강의를 시작하며 수강자를 격려하는 말을 작성한다.
+                        강의 대본의 끝은 항상 질문이 있느냐는 말로 끝낸다.
+                        첫 목차의 강의 대본의 시작부분에는 첫인사 및 자기소개와 강의를 시작하며 수강자를 격려하는 말을 작성한다.
                         마지막 목차의 강의 대본의 끝부분에는 끝인사와 강의를 맺으며 수강자를 격려하는 말을 작성한다.
                         """})
 
@@ -104,25 +107,28 @@ def makeScripts(pdf_path, contents_id):
 
         response  = client.chat.completions.create(
                             model="gpt-4-1106-preview",
-                            messages=prompt
+                            messages=prompt,
+                            # stream=True
                             ) 
         
         scripts.append(response.choices[0].message.content)
         prompt.append(response.choices[0].message)
         print("\n\n", response.choices[0].message.content, "\n\n")
 
+        # collected_messages = []
+        # for chunk in response:
+        #     chunk_message = str(chunk.choices[0].delta.content)
+        #     collected_messages.append(chunk_message)
+        #     print(chunk_message, end="", flush=True)
+        # prompt.append(collected_messages)
+        # print(collected_messages)
+
     return scripts
 
-if __name__ == "__main__":
 
-    file_path = "files/kinetic_theory_of_gases.pdf"
-    id = "d62ta"
-    scripts = makeScripts(file_path, id)
-
-    print(f"scripts: {scripts}")
-
-
-    # 강의 대본 저장
+# 강의 대본 저장
+def save_scripts(scripts, file_path, id):
+    
     file_name = file_path.split("/")[1].split(".")[0]
 
     today = str(datetime.now().date().today())
@@ -141,4 +147,16 @@ if __name__ == "__main__":
         with open(full_file_path, 'w', encoding='utf-8') as file:
             file.write(scripts[i])
 
-        print(f"\n'{full_file_path}'에 텍스트 저장 완료")
+        print(f"\n'{full_file_path}'에 강의 대본 저장 완료")
+
+
+if __name__ == "__main__":
+
+    file_path = "files/kinetic_theory_of_gases.pdf"
+    id = "d62ta"
+    # id = k3.rnd_str()
+    scripts = makeScripts(file_path, id)
+
+    print(f"scripts: {scripts}")
+
+    save_scripts(scripts, file_path, id)
