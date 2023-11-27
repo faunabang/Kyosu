@@ -1,5 +1,5 @@
 
-def generate_subtitle(chat_now, answer):
+def make_subtitle(chat_now, answer):
     # output.txt will be used to display the subtitle on OBS
     with open("texts/answer.txt", "w", encoding="utf-8") as outfile:
         try:

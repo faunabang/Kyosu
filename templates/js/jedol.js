@@ -45,6 +45,10 @@ $(document).ready(function() {
     $("#clientDevicesId").click( function(){
         $("#clientDevicesId").addClass("d-none")
     })
+    // 윈도우 크기가 변경될 때마다 높이를 업데이트합니다.
+   $(window).resize(updateChatHeight);
+   // 초기 로딩 시에도 #chat 요소의 높이를 설정합니다.
+   updateChatHeight();
 })
 function binding(){
     $("#start-chat-button").unbind()
@@ -57,10 +61,16 @@ function binding(){
         $(".start-info").hide(500,function(){
             $("#chat-play-pause-button").show(500)
             $(".micIcon").show(500)
+            $("#chat-play-pause-container").show(300);
+            $("#youtube-video-container").show(500);
             chatStart = 1; // 채팅 시작 플래그를 true로 설정
             audioPlayer.play(); // 오디오 재생
             chatPlayPause.play();
         })
+        $(".fs-1").hide();
+        $(".container").addClass("no-margin-padding");
+        $(".chat-box-container").addClass("chat-box-moved"); // chat-box-container에 새로운 클래스 추가
+        $(".youtube-video-container").addClass("youtube-embed");
     });
     $(".chat-play-pause-button").click(function(event) {
         event.stopPropagation();
@@ -93,7 +103,7 @@ function chat_start(_this){
     $("#chat-box").append(`${micIcon}`);  binding();
     $("#chat-play-pause-button").show(500)
     $(".micIcon").show(500)
-    recognition.start(); // 음성 인식 시작
+    recognition.start(); // 음성 인
    
 };
 function chat_stop(){
@@ -169,7 +179,7 @@ function initializeRecognition() {
         recognitionActive = true;
         var texts = Array.from(event.results).map(result => result[0].transcript).join("");
         if ($('#' + promptId).length == 0) {
-            $('#chat-box').append($('<p>').attr('id', promptId));
+            $('#chat').append($('<p>').attr('id', promptId));
         }
         
         $('#' + promptId).html(userIcon + texts);
@@ -184,56 +194,59 @@ function send_prompt(currentPromptId) {
        
         return; // 프롬프트가 비어 있으면 여기서 함수 종료
     }
-    var shouldStop = stopWords.some(function(stopWord) { // Using Array.prototype.some for brevity.
-        return promptText.includes(stopWord);
-    });
+    // var shouldStop = stopWords.some(function(stopWord) { // Using Array.prototype.some for brevity.
+    //     return promptText.includes(stopWord);
+    // });
 
-    if (shouldStop) { 
-        chat_stop();
-        return
-    }
+    // if (shouldStop) { 
+    //     chat_stop();
+    //     return
+    // }
 
     isApiCalling = true; // API 호출 상태를 true로 설정
     recognition.stop(); // 음성 인식 중지
     var aiChatId = "ai-" + Math.random().toString(36).substring(2, 10);
     $(".micIcon").hide(500,function(){ $(this).remove()})
-    $("#chat-box").append(`<p id="${aiChatId}"><span id="loading" class="loading"></span></p>`);
+    // $("#chat-box").append(`<p id="${aiChatId}"><span id="loading" class="loading"></span></p>`);
     startLoadingAnimation();
     // alert( clientDevicesId )
     $.ajax({
-        url: "/chatGPT_tts",
+        url: "/query",
         method: "POST",
         contentType: "application/json",
-        data: JSON.stringify({  clientDevicesId: clientDevicesId, prompt: promptText, voice: "alloy", chat_id: aiChatId }),
-        success: function(response) {
-            // debugger
-            // console.log( response)
-            var htmlContent = aiIcon + response.answer;
-            $('#' + aiChatId).html(htmlContent);
+        data: JSON.stringify({query: promptText}),
+        success: function() {
+            
             stopLoadingAnimation()
-            $('html, body').scrollTop($(document).height());
-            audioPlayer.src = 'chat_audio/' + aiChatId + '.mp3'
-            audioPlayer.play().then( function(){
-                stopLoadingAnimation(); // 
+            // $("#chat").scrollTop($("#chat")[0].scrollHeight);
+            updateScroll();
+            // $('html, body').scrollTop($(document).height());
+            // audioPlayer.src = 'chat_audio/' + aiChatId + '.mp3'
+            // audioPlayer.play().then( function(){
+            //     stopLoadingAnimation(); // 
                 
-                $('html, body').animate({
-                    scrollTop: $(document).height()
-                }, 3000);
-            // var shouldStop = stopWords.some(function(word) {return  promptText.includes(word) ||  response.answer.includes(word);});
-            //     if (shouldStop) {  $(".standby-Mic").remove();chat_stop()}
-            }); 
+            //     $('html, body').animate({
+            //         scrollTop: $(document).height()
+            //     }, 3000);
+            // // var shouldStop = stopWords.some(function(word) {return  promptText.includes(word) ||  response.answer.includes(word);});
+            // //     if (shouldStop) {  $(".standby-Mic").remove();chat_stop()}
+            // }); 
             
         },
         error: function(err) {
             stopLoadingAnimation(); // 
             console.log("Error occurred:", err);
-            $('#' + aiChatId).html("시험 버전에서는 1일 사용한도가  제한되어 있습니다. 약 10분 후에 다시 사용 가능합니다.");
-            audioPlayer.src = 'audio//start.mp3'
-            audioPlayer.play().then( function(){
-                $('html, body').scrollTop($(document).height());
-            })
+            $('#' + aiChatId).html("Server Error!");
+            updateScroll();
+            // audioPlayer.src = 'audio//start.mp3'
+            // audioPlayer.play().then( function(){
+            //     $('html, body').scrollTop($(document).height());
+            // })
         }
+        
     });
+    // $("#chat").scrollTop($("#chat")[0].scrollHeight);
+    updateScroll();
    
 }
 
@@ -271,30 +284,92 @@ function stopLoadingAnimation() {
 function randomKey(n){
    var randomStr=Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10)
     return randomStr.substring(0, n-1);
-}  
-$(document).ready(function() {
-    // ... (기존 코드)
+}
+function handleEnter(event) {
 
-    function addUserMessage(message) {
-        $('#chat-box').append(`<p>${userIcon}${message}</p>`);
-        $('html, body').animate({
-            scrollTop: $(document).height()
-        }, 1000);
+    if (event.which === 13 && !event.shiftKey) { // Shift가 아닌 Enter만 눌렸을 때
+        event.preventDefault(); // 엔터 키의 기본 동작(새 줄 추가)을 막습니다.
+        send_query(); // 메시지 전송 함수 호출
+    } else if (event.which === 13 && event.shiftKey) {
+        var textarea = $('#query').val();
+        var lines = textarea.split("\n").length;
+            lines = lines <10 ? lines : 9 
+           $('#query').attr('rows', lines + 1); // 한 줄 추가
     }
-
-    $('#send-button').click(function() {
-        const userInput = $('#user-input').val().trim();
-
-        if (userInput === '') return;
-
-        addUserMessage(userInput); // 사용자 입력을 채팅창에 추가
-
-        // AI에게 userInput을 전달하고 응답을 받아오는 부분을 추가하셔야 해요.
-        // 여기에 해당 부분을 추가하시면 사용자가 입력한 텍스트를 AI에게 전달할 수 있어요.
-        // 응답을 받은 후, AI의 답변도 채팅창에 추가해주시면 됩니다.
-        
-        $('#user-input').val(''); // 입력창 초기화
+}
+document.addEventListener('DOMContentLoaded', function () {
+    // 'start-chat-button' 클릭 이벤트 리스너 추가
+    document.getElementById('start-chat-button').addEventListener('click', function () {
+        // 'main-page'를 보이게 설정
+        document.getElementById('main-page').style.display = 'block';
+        // 이 버튼을 숨기는 추가적인 코드 (선택 사항)
+        this.style.display = 'none';
     });
-
-    // …
 });
+
+$('#navbarToggleBtn').click(function() {  $('#navbarNav').toggleClass('show'); });
+
+function send_query() {
+
+        var query = $("#query").val();
+        if (query.trim() === "") return;
+
+        var chatId=Math.random().toString(36).substring(2, 10)
+        var htmlQuery = marked.parse(query);
+        // $("#chat").append(`
+        
+        //         <div class='user_query  d-flex p-2  text-secondary'>
+        //                 <div ><i class="fa-thin fa-user fs-4"></i></div>
+        //                 <div id="user-${chatId}" class="ms-2" >${htmlQuery}</div>
+        //         </div>
+        // `);
+
+
+        
+        if ($('#' + chatId).length == 0) {
+            $('#chat').append($('<p>').attr('id', chatId));
+        }
+        
+        $('#' + chatId).html(userIcon + query);
+    
+        
+        $("#query").val("Waiting ... !");
+        $('#query').attr('rows', 1);
+        $("#query").prop('disabled', true);
+
+    
+          $.ajax({
+            url: "/query",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ query: query }),
+            success: function () {
+            
+                $("#query").val("");
+                // $("#chat").scrollTop($("#chat")[0].scrollHeight);         
+                $("#query").prop('disabled', false);
+                $("#query").focus();
+                updateScroll();
+                // 스크롤 위치를 가장 하단으로 이동
+               
+            },
+            error: function () {
+                $("#query").val("");
+                $("#query").prop('disabled', false);
+                // $("#chat").scrollTop($("#chat")[0].scrollHeight);
+                $("#query").focus();
+                updateScroll();
+            }
+        });
+
+        // 사용자가 메시지를 보낼 때도 스크롤 위치를 조정
+        // $("#chat").scrollTop($("#chat")[0].scrollHeight);
+        updateScroll();
+}
+function updateScroll() {
+    setTimeout(function() {
+        var chatBox = document.getElementById('chat-box-container');
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }, 0); // 100ms 지연
+}
+

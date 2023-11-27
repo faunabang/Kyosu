@@ -52,11 +52,12 @@ def makeContents(file_path):
                         다음은 교재의 내용이다.
                         """})
 
+    print("교재 파일 ----- loading")
     for page in pages:
         prompt.append({"role": "system", "content": f"{ page }"})
-        print(f"{page}\n\n")
-        # print( "{}\n".format(distance),"="*100, page.replace('\n', ''))
-    
+        # print(f"{page}\n\n")
+    print("done!")
+
     prompt.append({"role": "user", "content": "위 교재의 내용을 분석하여 해당 교재로 강의할 강의의 목차를 생성해줘." } )    
     # prompt.append({"role": "assistant", "content": "" } )
 
@@ -67,6 +68,8 @@ def makeContents(file_path):
                         ) 
     #print("response.choices[0].message=",response)
     contents= response.choices[0].message.content
+
+    print("목차:", contents)
 
     return contents
 

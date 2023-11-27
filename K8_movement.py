@@ -38,10 +38,5 @@ def extract_movement(text):
 
 if __name__ == "__main__":
     myvts = pyvts.vts()
-    try:
-        text = "여러분, 기체 분자 운동론에 대한 설명, 어떠셨나요? 여기까진 이해가 되셨을까요? 이해가 되지 않는 부분이 있다면, 질문을 통해 함께 해결해봅시다. (음미)"
-        extract_movement(text)
-        asyncio.run(connect_auth(myvts))
-        asyncio.run(trigger(myvts, text))
-    except:
-        print()
+    asyncio.run(connect_auth(myvts))
+    asyncio.run(trigger(myvts, "웃음"))

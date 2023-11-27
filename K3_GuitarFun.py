@@ -1,14 +1,16 @@
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
 import os
 import requests
 import random
 import string
 from datetime import datetime
 import re
+import time
 import asyncio
+import pyvts
 from transformers import GPT2Tokenizer
 from langchain.text_splitter import Document
+import K6_makeAudio as k6
+import K8_movement as k8
 
 tokenizer = None
 
@@ -140,37 +142,8 @@ def similarity_score_viewer(vector_db,query ):
         print(f"{index+1}:  {score}\t{doc}\n\n")
     print("="*00)
     return similarity
-
-
-
-def school_schedule(year):
-
-    ret =""
-    section=[1,2] 
-    for hakgi in section:
-        html = urlopen(f"https://jeju-s.jje.hs.kr/jeju-s/0202/schedule?section={hakgi}")
-        soup = BeautifulSoup(html, "html.parser")
-        bap = soup.select("a")
-       
-        for b in bap:
-            if  ':' in b.text:
-                bb=b.get("onclick")
-                t=bb.replace("'","")
-                t=t.split(",")
-                t.pop(0)
-                t.pop()
-                t = [e.strip() for e in t]
-                    
-                if t[0] != t[1] :
-                    tt=t[0] + "~" + t[1] + ":" + t[2] 
-                else:
-                    tt=t[0] + ":" + t[2]     
-                ret += tt + ", "   
-    return ret +"\n\n "
-
+        
 
 if __name__ == "__main__":
+    print("")
     
-    resp=school_schedule(datetime.now().today().year)
-    print(resp)
-   

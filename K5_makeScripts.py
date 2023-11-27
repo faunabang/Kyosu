@@ -51,7 +51,7 @@ def makeScripts(pdf_path, contents_id):
 
     contents = []
     today = str(datetime.now().date().today())
-    file_name = file_path.split("/")[1].split(".")[0]
+    file_name = pdf_path.split("/")[1].split(".")[0]
 
     # 목차 불러오기
     with open(f"contents\{file_name}-{today}\{file_name}-{contents_id}.txt", 'r', encoding='utf-8') as file:
@@ -69,6 +69,7 @@ def makeScripts(pdf_path, contents_id):
                         강의 대본은 구체적인 예시를 들어 수강자가 잘 이해할 수 있도록 작성한다.
                         수식 작성은 되도록 피하며, 교재에 있는 개념을 확실하게 전달할 수 있도록 작성한다.
                         강의가 지루하지 않도록 강의 대본은 친근한 말투로 작성하며, 중간중간 잠시 숨 돌릴 시간을 갖고, 농담도 섞어서 강의 대본을 작성한다.
+                        잠시 멈출 땐 문장 뒤에 [휴식]을 작성한다. 이외엔 []안에 어떠한 내용도 작성하지 않는다.
                         강의 대본 중간중간에 강사가 지을 표정을 작성한다.
                         표정은 다음 리스트에 있는 것 중 한 가지를 선택하여 (표정)과 같은 형태로 작성한다.
                         표정 리스트 = [웃음, 안타까움, 감탄, 노려봄, 음미]
@@ -78,9 +79,11 @@ def makeScripts(pdf_path, contents_id):
                         다음은 교재의 내용이다.
                         """})
 
+    print("교재 파일 ----- loading")
     for page in pages2:
         prompt.append({"role": "system", "content": f"{ page }"})
-        print(f"{page}\n\n")
+        # print(f"{page}\n\n")
+    print("done!")
 
     prompt.append({"role": "system", "content": f"""
                         위는 교재의 내용이다. 교재의 내용을 분석하여 교재 중심으로 강의 대본을 작성한다.
@@ -133,7 +136,7 @@ def save_scripts(scripts, file_path, id):
 
     today = str(datetime.now().date().today())
     folder_path = f"scripts\{file_name}-{today}"
-    folder2_path = f"scripts\{file_name}-{today}-{id}"
+    folder2_path = f"scripts\{file_name}-{today}\{file_name}-{today}-{id}"
 
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
