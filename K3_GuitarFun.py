@@ -46,21 +46,6 @@ def image_url_to_save(image_url, folder_name="", image_name=""):
     file.write(response.content)
     return True
 
-def today_year():
-    today = datetime.now().today()
-    return f"{today.strftime('%y년')}"  
-def today_month():
-    today = datetime.now().today()
-    return f"{today.strftime('%m월')}"  
-
-def today_date():
-    today = datetime.now().today()
-    return f"{today.strftime('%Y년 %m월 %d일')}"  
-    
-def today_week_name():
-    today = datetime.now().today()
-    days = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"]
-    return f"{days[today.weekday()]}" 
     
 def rnd_str(n=5, type="ns"):
     if type == "n":
@@ -127,21 +112,6 @@ def splitter_pages_viewer(pages):
          print( "{:02d} {}".format(index+1, tiktoken_len(page.page_content)), page.page_content.replace('\n', ''), page.metadata['source'])
 
     print("="*100)
-    
-def similarity_score_viewer(vector_db,query ):
-    loop = asyncio.get_event_loop() # 비동기 처리;
-    docs = loop.run_until_complete(vector_db.asimilarity_search_with_relevance_scores(query) ) # 유사도 있는 비동기 개체호출 
-    similarity=[]
-    for doc, score in docs:
-         similarity.append( ( doc.page_content,score) )
-    
-    print("="*100)
-    print( query ,"  추천한 유사 페이지")
-    print("-"*100)
-    for index, (doc, score) in enumerate(similarity) :
-        print(f"{index+1}:  {score}\t{doc}\n\n")
-    print("="*00)
-    return similarity
         
 
 if __name__ == "__main__":

@@ -48,16 +48,15 @@ def makeContents(file_path):
                         목차는 줄바꿈을 기준으로 나눈다.
                         목차의 순서는 표시하지 않고, 목차 내용만 작성한다.
                         목차 내용은 해당 목차 내에 있는 교재의 내용을 포괄하는 문장형식으로 작성한다.
-                        목차의 개수는 최대 10개이다. 10개 이내로 교재의 모든 내용을 설명할 수 있는 목차를 생성한다.
+                        목차의 개수는 최대 2개이다. 2개 이내로 교재의 모든 내용을 설명할 수 있는 목차를 생성한다.
                         다음은 교재의 내용이다.
                         """})
 
-    print("교재 파일 ----- loading")
     for page in pages:
         prompt.append({"role": "system", "content": f"{ page }"})
         # print(f"{page}\n\n")
-    print("done!")
 
+    print("목차 생성 중.....")
     prompt.append({"role": "user", "content": "위 교재의 내용을 분석하여 해당 교재로 강의할 강의의 목차를 생성해줘." } )    
     # prompt.append({"role": "assistant", "content": "" } )
 
@@ -69,18 +68,17 @@ def makeContents(file_path):
     #print("response.choices[0].message=",response)
     contents= response.choices[0].message.content
 
-    print("목차:", contents)
+    print("목차 생성 완료")
+    print("목차 :", contents)
 
     return contents
 
 
 # 목차 저장
-def save_contents(contents, file_path, id):
+def save_contents(contents, lecture_name):
 
-    today = str(datetime.now().date().today())
-    file_name = file_path.split("/")[1].split(".")[0]
-    contents_name = f"{file_name}-{id}.txt"
-    folder_path = f"contents\{file_name}-{today}"
+    contents_name = f"{lecture_name}.txt"
+    folder_path = f"contents"
 
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
@@ -96,10 +94,9 @@ def save_contents(contents, file_path, id):
 if __name__ == "__main__":
 
     file_path = "files/kinetic_theory_of_gases.pdf" # 파일 경로 -----------------------------
-    # id = "d62ta"
-    id = k3.rnd_str()
+    lecture_name = "test"+k3.rnd_str()
     contents = makeContents(file_path)
 
     print(f"contents: {contents}")
 
-    save_contents(contents, file_path, id)
+    save_contents(contents, lecture_name)

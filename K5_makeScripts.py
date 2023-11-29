@@ -8,7 +8,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import TextLoader
 from dotenv import load_dotenv;load_dotenv()
 
-def makeScripts(pdf_path, contents_id):
+def makeScripts(file_path, lecture_name):
 
     # loader = TextLoader(text_path, encoding='utf-8')
     # page=loader.load()[0]
@@ -21,10 +21,10 @@ def makeScripts(pdf_path, contents_id):
     # print(f" ----- load !")
 
 
-    file_name = pdf_path.split("/")[1]
+    file_name = file_path.split("/")[1]
     documents2 = []
 
-    with pdfplumber.open(pdf_path) as pdf_document:
+    with pdfplumber.open(file_path) as pdf_document:
         for page_number, page in enumerate(pdf_document.pages):
             text = page.extract_text()
 
@@ -34,7 +34,7 @@ def makeScripts(pdf_path, contents_id):
             }
             document= Document(page_content=text, metadata=metadata)
             documents2.append(document)
-    print(f"{file_name}  ----- load !")
+    print(f"{file_name}  ---------- load !")
 
 
     text_splitter = RecursiveCharacterTextSplitter(
@@ -50,14 +50,15 @@ def makeScripts(pdf_path, contents_id):
     # quit()
 
     contents = []
-    today = str(datetime.now().date().today())
-    file_name = pdf_path.split("/")[1].split(".")[0]
+    file_name = file_path.split("/")[1].split(".")[0]
 
     # 목차 불러오기
-    with open(f"contents\{file_name}-{today}\{file_name}-{contents_id}.txt", 'r', encoding='utf-8') as file:
+    with open(f"contents/{lecture_name}.txt", 'r', encoding='utf-8') as file:
         for line in file:
             contents.append(line.strip())
-    print("contents:", contents)
+            print(contents)
+    print("목차 :")
+    for content in contents: print(content)
 
     client = OpenAI()
     prompt=[]
@@ -69,7 +70,6 @@ def makeScripts(pdf_path, contents_id):
                         강의 대본은 구체적인 예시를 들어 수강자가 잘 이해할 수 있도록 작성한다.
                         수식 작성은 되도록 피하며, 교재에 있는 개념을 확실하게 전달할 수 있도록 작성한다.
                         강의가 지루하지 않도록 강의 대본은 친근한 말투로 작성하며, 중간중간 잠시 숨 돌릴 시간을 갖고, 농담도 섞어서 강의 대본을 작성한다.
-                        잠시 멈출 땐 문장 뒤에 [휴식]을 작성한다. 이외엔 []안에 어떠한 내용도 작성하지 않는다.
                         강의 대본 중간중간에 강사가 지을 표정을 작성한다.
                         표정은 다음 리스트에 있는 것 중 한 가지를 선택하여 (표정)과 같은 형태로 작성한다.
                         표정 리스트 = [웃음, 안타까움, 감탄, 노려봄, 음미]
@@ -79,11 +79,9 @@ def makeScripts(pdf_path, contents_id):
                         다음은 교재의 내용이다.
                         """})
 
-    print("교재 파일 ----- loading")
     for page in pages2:
         prompt.append({"role": "system", "content": f"{ page }"})
         # print(f"{page}\n\n")
-    print("done!")
 
     prompt.append({"role": "system", "content": f"""
                         위는 교재의 내용이다. 교재의 내용을 분석하여 교재 중심으로 강의 대본을 작성한다.
@@ -92,7 +90,7 @@ def makeScripts(pdf_path, contents_id):
     
     for content in contents:
         prompt.append({"role": "system", "content": f"{ content }"})
-        print(f"{page}\n\n")
+        # print(f"{page}\n\n")
 
     prompt.append({"role": "system", "content": f"""
                         위는 강의의 전체 목차를 순서대로 나열한 것이다.
@@ -103,6 +101,7 @@ def makeScripts(pdf_path, contents_id):
                         """})
 
     scripts = []
+    print("강의 대본 작성 중.....")
 
     for content in contents:
         prompt.append({"role": "user", "content": f"교재의 내용을 바탕으로 강의의 목차 {content}에 해당하는 강의 대본을 작성해줘." } )    
@@ -125,27 +124,29 @@ def makeScripts(pdf_path, contents_id):
         #     print(chunk_message, end="", flush=True)
         # prompt.append(collected_messages)
         # print(collected_messages)
+    
+    print("강의 대본 작성 완료")
 
     return scripts
 
 
 # 강의 대본 저장
-def save_scripts(scripts, file_path, id):
-    
-    file_name = file_path.split("/")[1].split(".")[0]
+def save_scripts(scripts, file_path, lecture_name):
 
     today = str(datetime.now().date().today())
-    folder_path = f"scripts\{file_name}-{today}"
-    folder2_path = f"scripts\{file_name}-{today}\{file_name}-{today}-{id}"
+    information_path = f"scripts/{lecture_name}/information.txt"
+    folder_path = f"scripts/{lecture_name}/texts"
 
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
-    if not os.path.exists(folder2_path):
-        os.makedirs(folder2_path)
 
+    information = f"강의 이름: {lecture_name}\n강의 파일 경로: {file_path}\n강의 대본 생성 일자: {today}"
+    with open(information_path, 'w', encoding='utf-8') as file:
+        file.write(information)
+    print(f"\n'{information_path}'에 강의 정보 저장 완료")
     for i in range(len(scripts)):
-        scripts_name = f"scripts-{file_name}-{id}-{i+1}.txt"
-        full_file_path = os.path.join(folder2_path, scripts_name)
+        script_name = f"{lecture_name}-{i+1}.txt"
+        full_file_path = os.path.join(folder_path, script_name)
 
         with open(full_file_path, 'w', encoding='utf-8') as file:
             file.write(scripts[i])

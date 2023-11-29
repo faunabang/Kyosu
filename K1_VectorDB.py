@@ -58,20 +58,22 @@ def create_query_embedding(query):
     return np.array(embedding_vector).astype('float32').reshape(1, -1)  # 2D array 형태로 반환합니다.  
    
 
-def vectorDB_create(vectorDB_folder, text_file, pdf_file):
+def vectorDB_create(vectorDB_folder, pdf_file):
 
-    loader = TextLoader(text_file, encoding='utf-8')
-    page=loader.load()[0]
-    documents=Document(page_content=page.page_content, metadata=page.metadata)
-    print(f"{text_file}  ----- load !")
+    # loader = TextLoader(text_file, encoding='utf-8')
+    # page=loader.load()[0]
+    # documents=Document(page_content=page.page_content, metadata=page.metadata)
+    # print(f"{text_file}  ----- load !")
 
+    file_name = pdf_file.split("/")[1]
+    documents = []
 
     with pdfplumber.open(pdf_file) as pdf_document:
         for page_number, page in enumerate(pdf_document.pages):
             text = page.extract_text()
 
             metadata = {
-                'source': 'chemi_1.pdf',
+                'source': file_name,
                 'page': page_number + 1
             }
             document = Document(page_content=text, metadata=metadata)
@@ -137,4 +139,21 @@ if __name__ == "__main__":
     print( f"vectorDB-faiss-{today}")
 
     vectorDB_folder = f"vectorDB-faiss-{today}"
-    vectorDB_create(vectorDB_folder, "files\\chemi_1.pdf")
+    vectorDB_create(vectorDB_folder, "files/kinetic_theory_of_gases.pdf")
+
+    # while True:  # 무한 반복 설정
+    #     query = input("질문? ")  # 사용자로부터 질문 받기
+    #     if query == "":  # 종료 조건 검사
+    #         print("프로그램을 종료합니다.")
+    #         break  # 종료 조건이 만족되면 while 루프 탈출
+
+    #     ai_mode = "jedolGPT"  # AI 모드 설정
+    #     answer = ai_response(
+    #         vectorDB_folder=vectorDB_folder if ai_mode in ["jedolGPT", "jshsGPT"] else "",
+    #         query=query,
+    #         token="dhxzZUwGDzdhGrBTMSMs2",  # 예시 토큰 값입니다. 실제 토큰으로 교체하세요.
+    #         ai_mode=ai_mode
+    #     )
+
+
+    #     print(f"AI 응답: {answer}")

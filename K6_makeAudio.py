@@ -1,6 +1,6 @@
 from elevenlabs import Voice, VoiceSettings, voices, generate, play, set_api_key, stream
 
-set_api_key("35be9ae7619739902f7f27cc97b282dc")
+set_api_key("e5fb5e7333aea826329755e9f1459ab6")
 
 def stream_audio(text):
     audio = generate(
