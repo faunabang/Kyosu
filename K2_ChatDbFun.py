@@ -23,7 +23,7 @@ def new_user(token):
     conn = sqlite3.connect('chat_DB.sqlite3')
     db = conn.cursor()
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    db.execute("INSERT INTO chat_data (token, date, history) VALUES (?, ?, ?, ?)",(token, current_time, '', ''))
+    db.execute("INSERT INTO chat_data (token, date, history) VALUES (?, ?, ?)",(token, current_time, ''))
     conn.commit()
     conn.close()
 
@@ -57,7 +57,7 @@ def update_history(token, new_chat, max_token=None):
     if row is None:
         # token이 일치하는 사용자가 존재하지 않는 경우, 새 사용자를 추가
         print("User not found. Adding new user!")
-        db.execute("INSERT INTO chat_data (token, date, history) VALUES (?, ?, ?, ?)", (token, current_time, json.dumps(new_chat,ensure_ascii=False)))
+        db.execute("INSERT INTO chat_data (token, date, history) VALUES (?, ?, ?)", (token, current_time, json.dumps(new_chat,ensure_ascii=False)))
     else:
         # 기존의 대화 내역을 가져와서 업데이트
         current_history = json.loads(row[0]) if row[0] else []

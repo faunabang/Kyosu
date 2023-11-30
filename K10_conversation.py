@@ -5,10 +5,10 @@ import os
 from datetime import datetime
 from dotenv import load_dotenv;load_dotenv()
 
-def conversation( vectorDB_folder="", query=""):
+def conversation( vectorDB_folder="", query="", token=""):
 
     client = OpenAI()
-    # chat_history=k2.query_history(token) # 기존 대화 내용
+    chat_history=k2.query_history(token) # 기존 대화 내용
     # print("chat_history=",chat_history)
     # answer="" 
     # new_chat=""
@@ -40,30 +40,29 @@ def conversation( vectorDB_folder="", query=""):
     #print("response.choices[0].message=",response)
     answer= response.choices[0].message.content
     
-    # new_chat=[{"role": "user", "content": query },{"role": "assistant", "content":answer}]  
+    new_chat=[{"role": "user", "content": query },{"role": "assistant", "content":answer}]  
 
-    # answer_no_update = any( chat["content"] == answer  for chat in chat_history)
-    # checkMsg=["죄송합니다","확인하십시요","OpenAI","불가능합니다","미안합니다.","않았습니다"]
-    # for a in checkMsg: 
-    #     if a in answer:
-    #        answer_no_update=True
-    #        break
-
-    # if not answer_no_update:
-    #         response = openai.ChatCompletion.create( model="gpt-4-vision-preview", messages= prompt,max_tokens=2000)
-    #         answer=response.choices[0].message.content
+    answer_no_update = any( chat["content"] == answer  for chat in chat_history)
+    checkMsg=["죄송합니다","확인하십시요","OpenAI","불가능합니다","미안합니다.","않았습니다"]
+    for a in checkMsg: 
+        if a in answer:
+           answer_no_update=True
+           break
                 
     # 새로운 대화 내용을 업데이트
-    # if not answer_no_update:
-    #     k2.update_history(token, new_chat, max_token=3000)
+    if not answer_no_update:
+        k2.update_history(token, new_chat, max_token=3000)
     return answer  
 
 if __name__ == "__main__":
+
+    k2.setup_db()
+    token = "abcdefghij"
+
     today = str(datetime.now().date().today())
     print( f"vectorDB-faiss-{today}")
-
     vectorDB_folder = f"vectorDB-faiss-{today}"
     k1.vectorDB_create(vectorDB_folder, "files/kinetic_theory_of_gases.pdf")
 
-    answer = conversation(vectorDB_folder, "기체분자운동론이 뭔가요")
+    answer = conversation(vectorDB_folder, "기체분자운동론이 뭔가요", token)
     print(answer)

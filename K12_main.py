@@ -80,7 +80,7 @@ def main():
             if terminal_input.lower() == "y":
                 
                 print("\n------------------ lecture started ------------------\n")
-                print("!!! --------------- Allow Vtube Studio API --------------- !!!")
+                print("!!!  Allow Vtube Studio API  !!!")
                 myvts = pyvts.vts()
                 asyncio.run(k8.connect_auth(myvts))
                 for script in scripts:

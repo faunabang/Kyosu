@@ -25,7 +25,7 @@ def start_lecture(script, myvts):
             for line in lines:
                 outfile.write(" ".join(line) + "\n")
 
-        print("Feeling :",feeling)  
+        print("Feeling :",feeling)
         asyncio.run(k8.trigger(myvts, feeling))
 
         print("Kyosu :",sentence)
