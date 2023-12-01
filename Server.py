@@ -50,9 +50,9 @@ def query():
     query = request.json.get("query")
     today = str(datetime.now().date().today())
     vectorDB_folder = f"vectorDB-faiss-{today}"
-    # token = "dhxzZUwGDzdhGrBTMSMs2" # 예시 토큰
+    token = "dhxzZUwGDzdhGrBTMSMs2" # 예시 토큰
 
-    answer = k10.conversation(vectorDB_folder, query)
+    answer = k10.conversation(vectorDB_folder, query, token)
     k9.make_subtitle(query, answer)
     k6.stream_audio(answer)
 

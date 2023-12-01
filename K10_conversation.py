@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from dotenv import load_dotenv;load_dotenv()
 
+# 강의가 끝나고 질문에 답변하는 코드
 def conversation( vectorDB_folder="", query="", token=""):
 
     client = OpenAI()

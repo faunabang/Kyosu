@@ -56,7 +56,7 @@ def makeScripts(file_path, lecture_name):
     with open(f"contents/{lecture_name}.txt", 'r', encoding='utf-8') as file:
         for line in file:
             contents.append(line.strip())
-            print(contents)
+            # print(contents)
     print("목차 :")
     for content in contents: print(content)
 

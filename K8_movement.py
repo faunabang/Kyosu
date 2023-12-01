@@ -1,12 +1,14 @@
 import asyncio
 import pyvts
 
+# Vtube Studio API 연결
 async def connect_auth(myvts):
     await myvts.connect()
     await myvts.request_authenticate_token()
     await myvts.request_authenticate()
     await myvts.close()
 
+# Vtube Studio 캐릭터 감정 표현하기
 async def trigger(myvts, feeling):
     await myvts.connect()
     await myvts.request_authenticate()
@@ -20,6 +22,7 @@ async def trigger(myvts, feeling):
     await myvts.request(send_hotkey_request)  # send request to play 'My Animation 1'
     await myvts.close()
 
+# 문장에서 감정 추출
 def extract_movement(text):
     # 찾은 괄호 안의 내용을 저장할 리스트
     feelings = []

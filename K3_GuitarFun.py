@@ -28,8 +28,6 @@ def page_content_append(oldChat="",newChat="",sourece=""):
        return Document( page_content=page_content ,metadata={'source': sourece})
        
        
-                    
-
 def image_url_to_save(image_url, folder_name="", image_name=""):
    # 이미지 저장  
     if image_url    =="" :  return False

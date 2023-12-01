@@ -1,6 +1,6 @@
 
 def make_subtitle(chat, answer):
-    # output.txt will be used to display the subtitle on OBS
+    # OBS에 송출할 답변 텍스트 파일로 저장
     with open("texts/answer.txt", "w", encoding="utf-8") as outfile:
         try:
             words = answer.split()
@@ -10,7 +10,7 @@ def make_subtitle(chat, answer):
         except:
             print("Error writing to answer.txt")
 
-    # chat.txt will be used to display the chat/question on OBS
+    # OBS에 송출할 질문 텍스트 파일로 저장
     with open("texts/chat.txt", "w", encoding="utf-8") as outfile:
         try:
             words = chat.split()
