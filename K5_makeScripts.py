@@ -109,6 +109,7 @@ def makeScripts(file_path, lecture_name):
 
         response  = client.chat.completions.create(
                             model="gpt-4-1106-preview",
+                            # model="gpt-3.5-turbo-1106",
                             messages=prompt,
                             # stream=True
                             ) 
@@ -157,8 +158,7 @@ def save_scripts(scripts, file_path, lecture_name):
 if __name__ == "__main__":
 
     file_path = "files/kinetic_theory_of_gases.pdf"
-    id = "d62ta"
-    # id = k3.rnd_str()
+    id = k3.rnd_str()
     scripts = makeScripts(file_path, id)
 
     print(f"scripts: {scripts}")

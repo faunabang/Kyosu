@@ -63,8 +63,9 @@ def makeContents(file_path):
     
     response  = client.chat.completions.create(
                         model="gpt-4-1106-preview",
+                        # model="gpt-3.5-turbo-1106",
                         messages=prompt
-                        ) 
+                        )
     #print("response.choices[0].message=",response)
     contents= response.choices[0].message.content
 
